@@ -1,0 +1,118 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.venv/
+env/
+.env/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+.pyre/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Cython build artifacts
+*.c
+*.cpp
+*.so
+
+# Data files
+*.csv
+*.tsv
+*.h5
+*.hdf5
+*.parquet
+*.feather
+*.pkl
+*.joblib
+*.db
+*.sqlite
+*.sav
+*.rda
+*.rdata
+
+# Model files
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.pb
+*.tflite
+
+# Jupyter Notebook metadata
+*.nbconvert.ipynb
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+
+# Mac OS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# Spyder
+.spyderproject
+.spyproject
+
+# Temporary files
+*.bak
+*.swp
+*.tmp
+
+# dotenv
+.env
+.env.*
+
+# Local configuration files
+local_settings.py
+
+# Generated files by build tools
+*.log
+
+# Folders with data that is not allowed to be public
+data/embeddings/
+!data/embeddings/.gitkeep
+data/interim/
+!data/interim/.gitkeep
+data/raw/
+!data/raw/.gitkeep
+visualisation/
+!visualisation/.gitkeep
