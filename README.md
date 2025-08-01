@@ -27,3 +27,29 @@ semantic-matching-nlp-eclass/
 ```
 
 Please note that, due to ECLASS copyright restrictions, files in `data/` and `visualisation/` cannot be included in this public repository.
+
+## Getting Started
+How to get this project running, assuming you have a cuda-capable GPU on your Windows machine:
+- Run `nvidia-smi` to see which version of cuda you have (For me that was cuda v12.9) 
+- Visit https://pytorch.org/get-started/locally/ and select the correct properties to get an installation link that looks like this:
+
+```commandline
+pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
+```
+- To verify if it worked, try the following snippet:
+
+```python
+import torch
+torch.cuda.is_available()
+```
+
+- Run `pip install -r requirements.txt` (Note that pip was a bit unhappy with the pytorch dependency, but since we already installed it above I quickly commented it out.)
+
+- Add the raw ECLASS Basic files (`ECLASS15_0_BASIC_EN_SG_01.xml`) to the `./data/raw/` directory
+- Run `src/data/extract_xml_to_csv.py`
+- Run `src/data/embeddings_<model>.py`
+
+>[!note]
+> Theoretically, the script is supposed to download the necessary model files, however I had to manually download the models 
+> and use a local filepath, since the script download kept getting stuck for some reason.
+> If that's the case, you can simply edit the line: `model = SentenceTransformer("<put path here instead of model name>, ...)`.
