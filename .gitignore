@@ -116,6 +116,8 @@ data/raw/
 !data/raw/.gitkeep
 visualisation/
 !visualisation/.gitkeep
+data/scores/
+!data/scores/.gitkeep
 
 # Local model files
 models
