@@ -5,7 +5,7 @@ from src.utils.logger import LoggerFactory
 # Setup logger
 logger = LoggerFactory.get_logger(__name__)
 
-# Extract the classification classes from the raw ECLASS XML data
+# Extract the classification classes from the original ECLASS XML data
 def extract_eclass_xml(xml_path: str, csv_save_path: str) -> None:
     logger.info(f"Processing XML: {xml_path}")
 
@@ -65,6 +65,6 @@ for segment in list(range(13, 52)) + [90]:
         logger.info(f"Skipping segment {segment}.")
         continue
 
-    xml_path = f"../../data/raw/ECLASS15_0_BASIC_EN_SG_{segment}.xml" # Adapt manually
-    save_path = f"../../data/interim/eclass-{segment}.csv" # Adapt manually
+    xml_path = f"../../data/original/ECLASS15_0_BASIC_EN_SG_{segment}.xml"  # Adapt manually
+    save_path = f"../../data/extracted/eclass-{segment}.csv" # Adapt manually
     extract_eclass_xml(xml_path, save_path)

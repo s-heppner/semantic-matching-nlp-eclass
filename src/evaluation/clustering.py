@@ -18,7 +18,7 @@ segments = [s for s in segments if s not in exceptions]
 for segment in segments:
     logger.info(f"Processing segment {segment}")
 
-    json_path = f"../../data/embeddings/eclass-{segment}-embeddings-qwen3.json"
+    json_path = f"../../data/embeddings/original/eclass-{segment}-embeddings-qwen3.json"
     save_path = f"../../visualisation/eclass-{segment}-embeddings-qwen3.html"
 
     if not os.path.exists(json_path):

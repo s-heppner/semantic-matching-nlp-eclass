@@ -14,7 +14,7 @@ segment_totals = {}
 version_labels = []
 
 for version in versions:
-    csv_path = f"../../data/interim/eclass-{version}.csv"
+    csv_path = f"../../data/extracted/eclass-{version}.csv"
 
     try:
         df = pd.read_csv(csv_path)

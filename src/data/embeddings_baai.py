@@ -20,7 +20,7 @@ model.to(device)
 logger.info("Model loaded.")
 
 # Load data
-csv_path = "../../data/interim/eclass-35.csv" # Manually adapt
+csv_path = "../../data/extracted/eclass-35.csv"  # Manually adapt
 database = pd.read_csv(csv_path, sep=",")
 logger.info(f"Database loaded from {csv_path} with {len(database)} rows.")
 
@@ -63,6 +63,6 @@ for idx, row in database.iterrows():
 logger.info(f"Embedding computation finished for {csv_path}. Total processed: {len(embedded_entries)}")
 
 # Save results
-save_path = "../../data/embeddings/eclass-35-embeddings-baai.json" # Manually adapt
+save_path = "../../data/embeddings/original/eclass-35-embeddings-baai.json"  # Manually adapt
 save_json(embedded_entries, save_path)
 logger.info(f"Embeddings saved to {save_path}")

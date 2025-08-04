@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 
 # Load JSON data
-json_path = "../../data/embeddings/eclass-13-embeddings-baai.json"
+json_path = "../../data/embeddings/original/eclass-13-embeddings-baai.json"
 with open(json_path, "r", encoding="utf-8") as f:
     data = json.load(f)
 

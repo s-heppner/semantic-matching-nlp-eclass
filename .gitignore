@@ -108,14 +108,17 @@ local_settings.py
 *.log
 
 # Folders with data that is not allowed to be public
-data/embeddings/*
-!data/embeddings/.gitkeep
+data/embeddings/original/*
+!data/embeddings/original/.gitkeep
 
-data/interim/*
-!data/interim/.gitkeep
+data/embeddings/filtered/*
+!data/embeddings/filtered/.gitkeep
 
-data/raw/*
-!data/raw/.gitkeep
+data/extracted/*
+!data/extracted/.gitkeep
+
+data/original/*
+!data/original/.gitkeep
 
 visualisation/*
 !visualisation/.gitkeep

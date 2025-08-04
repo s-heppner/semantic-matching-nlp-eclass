@@ -26,11 +26,8 @@ class LoggerFactory:
         logger = logging.getLogger(name)
         logger.setLevel(level)
 
-        # Avoid duplicate handlers when re-importing
         if not logger.handlers:
             logger.addHandler(handler)
-
-        # ✨ Fix: disable propagation to root logger
         logger.propagate = False
 
         return logger

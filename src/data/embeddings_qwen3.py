@@ -79,6 +79,6 @@ for segment in list(range(13, 52)) + [90]:
         logger.info(f"Skipping segment {segment}.")
         continue
 
-    csv_path = f"../../data/interim/eclass-{segment}.csv" # Adapt manually
-    save_path = f"../../data/embeddings/eclass-{segment}-embeddings-qwen3.json" # Adapt manually
+    csv_path = f"../../data/extracted/eclass-{segment}.csv" # Adapt manually
+    save_path = f"../../data/embeddings/original/eclass-{segment}-embeddings-qwen3.json" # Adapt manually
     embed_eclass_file(csv_path, save_path)
