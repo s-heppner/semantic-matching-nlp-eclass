@@ -3,6 +3,7 @@ from sentence_transformers import SentenceTransformer
 from src.utils.io import save_json
 from src.utils.logger import LoggerFactory
 import torch
+import numpy as np
 
 # Setup logger
 logger = LoggerFactory.get_logger(__name__)
@@ -13,7 +14,8 @@ logger.info(f"Using device: {device}")
 
 # Load model
 model = SentenceTransformer(
-    "Qwen/Qwen3-Embedding-8B",
+    model_name_or_path="Qwen/Qwen3-Embedding-8B",
+    # model_name_or_path="../../models/qwen3",  # Use this when manually downloaded the model
     model_kwargs={"torch_dtype": torch.float16}, # 16-bit floating point, uses less memory, adapt manually
     device=device,
     tokenizer_kwargs={"padding_side": "left"},
@@ -62,7 +64,8 @@ def embed_eclass_file(csv_path: str, save_path: str) -> None:
             "id": row["id"],
             "preferred-name": row["preferred-name"],
             "description": row["definition"],
-            "embedding": embedding.tolist()
+            "vector_norm": float(np.linalg.norm(embedding)),
+            "embedding": embedding.tolist(),
         }
         embedded_entries.append(entry)
 

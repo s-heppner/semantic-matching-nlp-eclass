@@ -108,16 +108,20 @@ local_settings.py
 *.log
 
 # Folders with data that is not allowed to be public
-data/embeddings/
+data/embeddings/*
 !data/embeddings/.gitkeep
-data/interim/
+
+data/interim/*
 !data/interim/.gitkeep
-data/raw/
+
+data/raw/*
 !data/raw/.gitkeep
-visualisation/
-!visualisation/.gitkeep
-data/scores/
+
+data/scores/*
 !data/scores/.gitkeep
+
+visualisation/*
+!visualisation/.gitkeep
 
 # Local model files
 models
