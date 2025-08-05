@@ -117,5 +117,11 @@ data/interim/*
 data/raw/*
 !data/raw/.gitkeep
 
+data/scores/*
+!data/scores/.gitkeep
+
+visualisation/*
+!visualisation/.gitkeep
+
 # Local model files
 models
