@@ -4,6 +4,7 @@ import torch
 from sentence_transformers import SentenceTransformer
 from src.utils.io import save_json
 from src.utils.logger import LoggerFactory
+import numpy as np
 
 # Setup logger
 logger = LoggerFactory.get_logger(__name__)
@@ -53,6 +54,7 @@ for idx, row in database.iterrows():
         "id": id,
         "preferred-name": preferred_name,
         "description": description,
+        "vector_norm": float(np.linalg.norm(embedding)),
         "embedding": embedding.tolist()
     }
     embedded_entries.append(entry)
