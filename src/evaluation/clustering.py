@@ -1,40 +1,59 @@
-import json
+"""Script to cluster and visualise ECLASS embeddings using DBSCAN and UMAP."""
+
+import logging
+import textwrap
 import numpy as np
 import pandas as pd
+import plotly.express as px
 import umap
+from itertools import cycle
 from sklearn.cluster import DBSCAN
 from sklearn.preprocessing import normalize
-import plotly.express as px
-import os
-
+from src.utils.io import load_json
 from src.utils.logger import LoggerFactory
 
-logger = LoggerFactory.get_logger(__name__)
 
-exceptions = []
-segments = list(range(13, 52)) + [90]
-segments = [s for s in segments if s not in exceptions]
+def wrap_text(s: str, width: int) -> str:
+    """Wraps a string to the given width with <br> line breaks."""
 
-for segment in segments:
-    logger.info(f"Processing segment {segment}")
+    if not isinstance(s, str):
+        return ""
+    return "<br>".join(textwrap.wrap(s, width=width, break_long_words=True, replace_whitespace=False))
 
-    json_path = f"../../data/embeddings/original/eclass-{segment}-embeddings-qwen3.json"
-    save_path = f"../../visualisation/eclass-{segment}-embeddings-qwen3.html"
 
-    if not os.path.exists(json_path):
-        logger.warning(f"Skipping segment {segment}: JSON file not found at {json_path}")
-        continue
+def first_n_words(s: str, n: int) -> str:
+    """Returns the first n words from a string."""
 
-    # Load JSON data
-    with open(json_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
+    if not isinstance(s, str):
+        return ""
+    words = s.split()
+    return " ".join(words[:n])
 
-    df = pd.DataFrame(data)
+
+def cluster_and_plot(input_path: str, output_path: str, logger: logging.Logger) -> None:
+    """Loads embeddings, runs DBSCAN clustering, reduces with UMAP, and saves a Plotly HTML scatter."""
+
+    logger.info(f"Starting clustering ...")
+
+    # Load embeddings from JSON file
+    try:
+        database = load_json(input_path)
+        logger.info(f"Database loaded from {input_path} with {len(database)} rows.")
+    except Exception as e:
+        logger.error(f"Failed to read {input_path}: {e}")
+        return
+    df = pd.DataFrame(database)
     embeddings = np.array(df["embedding"].tolist())
 
+    # Check that enough data points for clustering are available
+    if len(embeddings) < 5:
+        logger.warning(f"Segment {segment} has too few points ({len(embeddings)}), skipping clustering and UMAP.")
+        return
+
     # DBSCAN clustering
+    logger.info("Computing clusters ...")
     embeddings = normalize(embeddings, norm='l2')
-    dbscan = DBSCAN(eps=0.05, min_samples=5, metric="cosine")
+    dbscan = DBSCAN(eps=0.2, min_samples=3, metric="cosine")
     labels = dbscan.fit_predict(embeddings)
     df["cluster"] = labels
 
@@ -43,7 +62,7 @@ for segment in segments:
         if cluster == -1:
             continue  # Skip noise
         examples = df[df["cluster"] == cluster]["preferred-name"].head(5).tolist()
-        logger.info(f"Segment {segment} - Cluster {cluster} example preferred names: {examples}")
+        logger.info(f"Segment {segment} cluster {cluster} examples: {examples}")
 
     # UMAP reduction to 2D
     reducer = umap.UMAP(metric="cosine", random_state=42)
@@ -51,22 +70,90 @@ for segment in segments:
     df["x"] = embeddings_2d[:, 0]
     df["y"] = embeddings_2d[:, 1]
 
+    # Pre-wrap text columns
+    df["preferred_name_wrapped"] = df["preferred-name"].apply(lambda s: wrap_text(first_n_words(s, 3), width=16))
+    df["definition_wrapped"] = df["definition"].apply(lambda s: wrap_text(s, width=115))
+
     # Plot
+    signal_palette = [
+        "#0072B2",  # Blue
+        "#D55E00",  # Red
+        "#009E73",  # Green
+        "#E69F00",  # Orange
+        "#CC79A7",  # Purple
+        "#56B4E9",  # Sky blue
+        "#F0E442",  # Yellow
+    ]
+
+    label_strs = [str(c) for c in unique_clusters]
+    color_discrete_map = {"-1": "#000000"}  # Noise = black
+
+    remaining_labels = [s for s in label_strs if s != "-1"]
+    palette_iter = cycle(signal_palette)
+    for lbl in remaining_labels:
+        color_discrete_map[lbl] = next(palette_iter)
+
+    df["cluster"] = df["cluster"].astype(str)
     fig = px.scatter(
         df,
         x="x",
         y="y",
-        color=df["cluster"].astype(str),
-        hover_data=["preferred-name", "description"],
-        title=f"Preferred Names Embedding Map (UMAP, DBSCAN Clusters) - Segment {segment}"
+        color="cluster",
+        hover_data={
+            "id": True,
+            "preferred-name": True,
+            "preferred_name_wrapped": False,
+            "definition": False,
+            "definition_wrapped": True,
+            "x": False,
+            "y": False,
+            "cluster": False
+        },
+        title=f"ECLASS clustering - Segment {segment}",
+        category_orders={"cluster": ["-1"] + remaining_labels},
+        color_discrete_map=color_discrete_map,
+        text="preferred_name_wrapped"  # Small name above point
     )
-    fig.update_traces(marker=dict(size=5, opacity=0.7), selector=dict(mode='markers'))
+
+    fig.update_traces(
+        mode="markers+text",
+        marker=dict(size=5, opacity=0.75),
+        textposition="top center",
+        textfont=dict(size=8),
+        selector=dict(mode='markers+text')
+    )
+
+    # Match text colour to point colour per trace
+    fig.for_each_trace(lambda tr: tr.update(textfont_color=tr.marker.color))
+
     fig.update_layout(
         xaxis_title="UMAP-1",
         yaxis_title="UMAP-2",
-        showlegend=True
+        showlegend=True,
     )
 
     # Save HTML
-    fig.write_html(save_path)
-    logger.info(f"DBSCAN plot saved to {save_path}")
+    fig.write_html(output_path)
+    logger.info(f"DBSCAN plot saved to: {output_path}")
+
+
+if __name__ == "__main__":
+    # Settings
+    apply_filters = True  # Adapt manually: run clustering on filtered or unfiltered data
+    exceptions = []  # Adapt manually: exclude specific segments
+    transformer = "qwen3"  # Adapt manually: cluster embeddings from this transformer (qwen3, bge, gemini)
+
+    # Setup
+    logger = LoggerFactory.get_logger(__name__)
+    logger.info(f"Initialising clustering ...")
+    input_dir = "filtered" if apply_filters else "unfiltered"
+    segments = list(range(13, 52)) + [90]
+
+    # Compute clusters for each segment
+    for segment in segments:
+        if segment in exceptions:
+            logger.warning(f"Skipping segment {segment}.")
+            continue
+        input_path = f"../../data/embedded/{input_dir}/eclass-{segment}-embeddings-{transformer}.json"
+        output_path = f"../../visualisation/eclass-{segment}-embeddings-{input_dir}-{transformer}.html"
+        cluster_and_plot(input_path, output_path, logger)

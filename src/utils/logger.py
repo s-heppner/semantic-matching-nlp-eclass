@@ -1,12 +1,16 @@
+"""
+Class to create color-formatted loggers for console output.
+"""
 import logging
+
 
 class LoggerFactory:
     COLORS = {
-        'INFO': '\033[94m',     # Blue
+        'INFO': '\033[94m',  # Blue
         'WARNING': '\033[93m',  # Yellow
-        'ERROR': '\033[91m',    # Red
-        'DEBUG': '\033[90m',    # Grey
-        'CRITICAL': '\033[95m', # Magenta
+        'ERROR': '\033[91m',  # Red
+        'DEBUG': '\033[90m',  # Grey
+        'CRITICAL': '\033[95m',  # Magenta
     }
     RESET = '\033[0m'
 

@@ -1,110 +1,218 @@
-import pandas as pd
+"""Script to visualise non-semantic ECLASS definitions using predefined filters."""
+
+import logging
 import matplotlib.pyplot as plt
-from collections import defaultdict
+import os
+import pandas as pd
+from typing import List, Dict
+from src.embedding.filter import (
+    filter_definitions_missing,
+    filter_definitions_missing_suffix,
+    filter_definitions_structural,
+)
 from src.utils.logger import LoggerFactory
 
-logger = LoggerFactory.get_logger(__name__)
 
-exceptions = []
-versions = [v for v in list(range(13, 52)) + [90] if v not in exceptions]
+def plot_nonsemantic_ratios(
+        input_path: str,
+        segments: List[int],
+        exceptions: List[int],
+        output_path: str,
+        logger: logging.Logger,
+) -> None:
+    """Plots the ratio of non-semantic definitions per ECLASS segment."""
 
-# Count placeholders
-placeholder_counts = defaultdict(lambda: defaultdict(int))
-segment_totals = {}
-version_labels = []
+    logger.info("Starting non-semantic definition ratio plot ...")
 
-for version in versions:
-    csv_path = f"../../data/extracted/eclass-{version}.csv"
+    # Prepare fast lookups
+    missing_set = set(filter_definitions_missing)
+    suffixes = tuple(filter_definitions_missing_suffix)
+    structural_set = set(filter_definitions_structural)
 
-    try:
-        df = pd.read_csv(csv_path)
-    except Exception as e:
-        logger.error(f"Failed to load CSV {csv_path}: {e}")
-        continue
+    # Containers
+    total_per_seg: Dict[int, int] = {}
+    miss_per_seg: Dict[int, int] = {}
+    struct_per_seg: Dict[int, int] = {}
+    processed_segments: List[int] = []
 
-    if "definition" not in df.columns:
-        logger.warning(f"No 'definition' column in {csv_path}, skipping.")
-        continue
+    # Run for each segment
+    for seg in segments:
+        if seg in exceptions:
+            logger.warning(f"Skipping segment {seg}.")
+            continue
 
-    total = len(df)
-    segment_totals[version] = total
+        # Load ECLASS classes from CSV file
+        try:
+            database = pd.read_csv(input_path.format(segment=seg), sep=",")
+            logger.info(f"Database loaded from {input_path} with {len(database)} rows.")
+        except Exception as e:
+            logger.error(f"Failed to read file: {input_path}, Error: {e}")
+            continue
 
-    placeholders = df["definition"].dropna().loc[
-        lambda x: x.str.startswith("Sub-group (4th level)") | x.str.startswith("sub-group (4th level)")
+        # Ensure required columns exist
+        required_columns = ["definition", "preferred-name", "id"]
+        for col in required_columns:
+            if col not in database.columns:
+                logger.error(f"Missing required column: {col}")
+                continue
+
+        # Count non-semantic definitions
+        total = len(database)
+        total_per_seg[seg] = total
+        processed_segments.append(seg)
+
+        n_missing = 0
+        n_structural = 0
+
+        for definition in database["definition"].dropna().astype(str):
+            if (definition in missing_set) or definition.endswith(suffixes):
+                n_missing += 1
+            elif definition in structural_set:
+                n_structural += 1
+
+        miss_per_seg[seg] = n_missing
+        struct_per_seg[seg] = n_structural
+
+        logger.info(f"Segment {seg}: total={total}, missing={n_missing}, structural={n_structural}")
+
+    if not processed_segments:
+        logger.error("No segments processed, nothing to plot.")
+        return
+
+    # Build percentage arrays aligned with processed segment order
+    x_labels = [str(s) for s in processed_segments]
+    miss_pct = [
+        (miss_per_seg.get(s, 0) / max(total_per_seg.get(s, 0), 1)) * 100.0 for s in processed_segments
+    ]
+    struct_pct = [
+        (struct_per_seg.get(s, 0) / max(total_per_seg.get(s, 0), 1)) * 100.0 for s in processed_segments
     ]
 
-    for placeholder_text, count in placeholders.value_counts().items():
-        placeholder_counts[placeholder_text][version] = count
+    # Plot
+    plt.figure(figsize=(16, 8), dpi=300)
 
-    version_labels.append(str(version))
-    logger.info(f"Version {version}: {len(placeholders)} placeholder definitions found out of {total} total entries.")
+    color_missing = "#407fb7"  # lighter
+    color_struct = "#8ebae5"  # darker
 
-# Create DataFrame
-df_counts = pd.DataFrame(placeholder_counts).fillna(0).astype(int)
-df_counts = df_counts.T
+    bottom = [0.0] * len(processed_segments)
+    plt.bar(x_labels, miss_pct, bottom=bottom, label="Missing definition", color=color_missing)
+    bottom = [b + h for b, h in zip(bottom, miss_pct)]
+    plt.bar(x_labels, struct_pct, bottom=bottom, label="Structural definition", color=color_struct)
+    bottom = [b + h for b, h in zip(bottom, struct_pct)]
 
-# Calculate per-segment placeholder sums for annotation
-segment_placeholder_sums = {v: df_counts[v].sum() for v in versions}
+    # Percent labels inside each stacked part
+    for i in range(len(processed_segments)):
+        m = miss_pct[i]
+        s = struct_pct[i]
+        if m > 0:
+            # centered in the bottom segment
+            plt.text(
+                i, m / 2.0, f"{m:.1f}%",
+                ha="center", va="center",
+                fontsize="xx-small",
+                color="white"
+            )
+        if s > 0:
+            # centered in the structural segment
+            plt.text(
+                i, m + (s / 2.0), f"{s:.1f}%",
+                ha="center", va="center",
+                fontsize="xx-small",
+                color="black"
+            )
 
-# Convert to ratio
-for version in versions:
-    total = segment_totals.get(version, 1)
-    df_counts[version] = df_counts[version] / total * 100  # in %
+    # Annotate stacked fraction (above bar) and overall % (above that)
+    for i, seg in enumerate(processed_segments):
+        filtered_sum = miss_per_seg.get(seg, 0) + struct_per_seg.get(seg, 0)
+        total_defs = total_per_seg.get(seg, 0)
+        top = bottom[i]
+        if top > 0 and total_defs > 0:
+            overall_pct = (filtered_sum / total_defs) * 100.0
 
-df_counts["total"] = df_counts.sum(axis=1)
-df_counts = df_counts.sort_values("total", ascending=False)
-df_counts = df_counts.drop(columns=["total"])
+            # Stacked fraction
+            plt.text(
+                i,
+                top + 1.0,
+                f"{filtered_sum}\n—\n{total_defs}",
+                ha="center",
+                va="bottom",
+                fontsize="xx-small"
+            )
 
-# Color palette
-cmap = plt.get_cmap("tab20")
-colors = [cmap(i % cmap.N) for i in range(len(df_counts))]
+            # Overall % above that
+            plt.text(
+                i,
+                top + 8.0,
+                f"{overall_pct:.1f}%",
+                ha="center",
+                va="bottom",
+                fontsize="xx-small",
+                fontweight="bold"
+            )
 
-plt.figure(figsize=(16, 8))
+    # Calculate overall mean percentage
+    mean_pct = sum(
+        ((miss_per_seg.get(s, 0) + struct_per_seg.get(s, 0)) / total_per_seg.get(s, 1)) * 100.0
+        for s in processed_segments
+    ) / len(processed_segments)
 
-bottom = [0] * len(versions)
-for idx, (placeholder_text, row) in enumerate(df_counts.iterrows()):
-    ratios = [row.get(v, 0) for v in versions]
-    plt.bar(
-        [str(v) for v in versions],
-        ratios,
-        bottom=bottom,
-        label=placeholder_text,
-        color=colors[idx]
+    plt.axhline(
+        y=mean_pct,
+        color="red",
+        linestyle="--",
+        linewidth=1.5,
+        alpha=0.7,
+        zorder=0
     )
-    bottom = [b + r for b, r in zip(bottom, ratios)]
+    plt.text(
+        x=- 0.3,
+        y=mean_pct + 0.5,
+        s=f"{mean_pct:.1f}%",
+        color="red",
+        fontsize="xx-small",
+        fontweight="bold",
+        va="bottom",
+        ha="right",
+        alpha=0.8
+    )
 
-# Add annotations above bars
-for i, v in enumerate(versions):
-    placeholder_sum = segment_placeholder_sums[v]
-    total_defs = segment_totals[v]
-    ratio_sum = bottom[i]
+    # Layout
+    max_ratio = max(bottom) if bottom else 0
+    plt.ylim(0, max_ratio * 1.2)
 
-    # Only add if the bar is non-zero
-    if ratio_sum > 0:
-        label_text = f"{placeholder_sum}\n—\n{total_defs}"
-        y_pos = ratio_sum + 2  # offset above bar
-        plt.text(
-            i, y_pos,
-            label_text,
-            ha="center", va="bottom", fontsize="x-small"
-        )
+    plt.xlabel("ECLASS Segments")
+    plt.ylabel("Non-semantic ECLASS Definition Ratio")
+    plt.title("Non-semantic ECLASS Definitions per Segment")
+    plt.xticks(rotation=45)
 
-# Dynamically extend y-axis to avoid text cutoff
-max_ratio = max(bottom)
-plt.ylim(0, max_ratio * 1.2)
+    plt.legend(
+        fontsize="small",
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.2),
+        ncol=2,
+        frameon=False
+    )
 
-plt.xlabel("ECLASS Segments")
-plt.ylabel("Placeholder Definition Ratio (%)")
-plt.title("Stacked Causes of Placeholder Definitions per ECLASS Segment")
-plt.xticks(rotation=45)
+    plt.grid(axis="y", linestyle="--", alpha=0.6)
+    plt.tight_layout(rect=(0, 0.05, 1, 1))
 
-# Legend below plot
-plt.legend(fontsize="small", loc="upper center", bbox_to_anchor=(0.5, -0.2), ncol=1, frameon=False)
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    plt.savefig(output_path, bbox_inches="tight")
+    logger.info(f"Plot saved to: {output_path}")
 
-plt.grid(axis="y", linestyle="--", alpha=0.6)
-plt.tight_layout(rect=[0, 0.05, 1, 1])
+    plt.show()
 
-plt.savefig("../../visualisation/placeholder_definitions_ratio.png", bbox_inches="tight")
-logger.info("Plot saved to ../../visualisation/placeholder_definitions_ratio.png")
 
-plt.show()
+if __name__ == "__main__":
+    # Settings
+    exceptions = []  # Adapt manually: exclude specific segments
+
+    # Setup
+    logger = LoggerFactory.get_logger(__name__)
+    logger.info("Initialising non-semantic definition plotter ...")
+    segments = list(range(13, 52)) + [90]
+    input_path = "../../data/extracted/eclass-{segment}.csv"
+    output_path = "../../visualisation/nonsemantic_definitions_ratio.png"
+
+    # Run for each segment
+    plot_nonsemantic_ratios(input_path, segments, exceptions, output_path, logger)

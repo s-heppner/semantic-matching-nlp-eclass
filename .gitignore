@@ -107,12 +107,12 @@ local_settings.py
 # Generated files by build tools
 *.log
 
-# Folders with data that is not allowed to be public
-data/embeddings/original/*
-!data/embeddings/original/.gitkeep
+# Folders with embedding that is not allowed to be public
+data/embedded/unfiltered/*
+!data/embedded/unfiltered/.gitkeep
 
-data/embeddings/filtered/*
-!data/embeddings/filtered/.gitkeep
+data/embedded/filtered/*
+!data/embedded/filtered/.gitkeep
 
 data/extracted/*
 !data/extracted/.gitkeep
