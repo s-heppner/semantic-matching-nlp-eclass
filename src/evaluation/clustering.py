@@ -1,4 +1,4 @@
-"""Script to cluster and visualise ECLASS embeddings using DBSCAN and UMAP."""
+"""Module to cluster and visualise ECLASS embeddings using DBSCAN and UMAP."""
 
 import logging
 import textwrap
@@ -139,9 +139,9 @@ def cluster_and_plot(input_path: str, output_path: str, logger: logging.Logger) 
 
 if __name__ == "__main__":
     # Settings
-    apply_filters = True  # Adapt manually: run clustering on filtered or unfiltered data
-    exceptions = []  # Adapt manually: exclude specific segments
-    transformer = "qwen3"  # Adapt manually: cluster embeddings from this transformer (qwen3, bge, gemini)
+    apply_filters = True  # Run clustering on filtered or unfiltered data
+    exceptions = []  # Exclude specific segments
+    transformer = "qwen3"  # Cluster embeddings from this transformer (qwen3, bge, gemini)
 
     # Setup
     logger = LoggerFactory.get_logger(__name__)

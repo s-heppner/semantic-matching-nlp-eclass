@@ -1,6 +1,7 @@
-"""Script to embed ECLASS definitions using the gemini-embedding-001 transformer model."""
+"""Module to embed ECLASS definitions using the gemini-embedding-001 transformer model."""
 
 import logging
+import numpy as np
 import pandas as pd
 from google import genai
 from google.genai.types import EmbedContentConfig
@@ -83,6 +84,7 @@ def embed_eclass(
             "id": row["id"],
             "preferred-name": row["preferred-name"],
             "definition": row["definition"],
+            "vector-norm": float(np.linalg.norm(embedding)),
             "embedding": embedding,
         }
         for row, embedding in zip(valid_rows, embeddings)
@@ -94,9 +96,9 @@ def embed_eclass(
 
 if __name__ == "__main__":
     # Settings
-    apply_filters = True  # Adapt manually: enable filtering of non-semantic definitions
-    exceptions = []  # Adapt manually: exclude specific segments
-    project = "PLACEHOLDER"  # Adapt manually: project name from Google Cloud
+    apply_filters = True  # Enable filtering of non-semantic definitions
+    exceptions = []  # Exclude specific segments
+    project = "PLACEHOLDER"  # Project name from Google Cloud
 
     # Setup
     logger = LoggerFactory.get_logger(__name__)

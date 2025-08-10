@@ -1,4 +1,4 @@
-"""Script to visualise non-semantic ECLASS definitions using predefined filters."""
+"""Module to visualise non-semantic ECLASS definitions using predefined filters."""
 
 import logging
 import matplotlib.pyplot as plt
@@ -205,7 +205,7 @@ def plot_nonsemantic_ratios(
 
 if __name__ == "__main__":
     # Settings
-    exceptions = []  # Adapt manually: exclude specific segments
+    exceptions = []  # Exclude specific segments
 
     # Setup
     logger = LoggerFactory.get_logger(__name__)

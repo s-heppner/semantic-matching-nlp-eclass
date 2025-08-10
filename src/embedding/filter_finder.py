@@ -1,4 +1,4 @@
-"""Script to identify potentially non-semantic ECLASS definitions based on regex patterns."""
+"""Module to identify potentially non-semantic ECLASS definitions based on regex patterns."""
 
 import pandas as pd
 import re
@@ -6,7 +6,7 @@ from src.utils.logger import LoggerFactory
 
 if __name__ == "__main__":
     # Settings
-    exceptions = []  # Adapt manually: exclude specific segments
+    exceptions = []  # Exclude specific segments
 
     # Setup
     logger = LoggerFactory.get_logger(__name__)

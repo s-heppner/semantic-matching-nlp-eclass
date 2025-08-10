@@ -1,10 +1,11 @@
-"""
-Class to create color-formatted loggers for console output.
-"""
+"""Module to create colour-formatted loggers for console output."""
+
 import logging
 
 
 class LoggerFactory:
+    """Factory class for creating colour-formatted loggers."""
+
     COLORS = {
         'INFO': '\033[94m',  # Blue
         'WARNING': '\033[93m',  # Yellow
@@ -15,13 +16,19 @@ class LoggerFactory:
     RESET = '\033[0m'
 
     class ColorFormatter(logging.Formatter):
+        """Custom formatter that adds colours based on log level."""
+
         def format(self, record):
+            """Formats a log record with colours based on its log level."""
+
             color = LoggerFactory.COLORS.get(record.levelname, LoggerFactory.RESET)
             message = super().format(record)
             return f"{color}{message}{LoggerFactory.RESET}"
 
     @staticmethod
     def get_logger(name: str, level=logging.INFO) -> logging.Logger:
+        """Returns a logger with colour formatting for console output."""
+
         formatter = LoggerFactory.ColorFormatter("%(asctime)s [%(levelname)s] %(message)s")
 
         handler = logging.StreamHandler()

@@ -1,4 +1,4 @@
-"""Script to filter out non-semantic embeddings from ECLASS embedding files."""
+"""Module to filter out non-semantic embeddings from ECLASS embedding files."""
 
 from src.embedding.filter import (
     filter_definitions_missing,
@@ -10,8 +10,8 @@ from src.utils.logger import LoggerFactory
 
 if __name__ == "__main__":
     # Settings
-    exceptions = []  # Adapt manually: exclude specific segments
-    transformer = "gemini"  # Adapt manually: filter embeddings from this transformer (qwen3, bge, gemini)
+    exceptions = []  # Exclude specific segments
+    transformer = "gemini"  # Filter embeddings from this transformer (qwen3, bge, gemini)
 
     # Setup
     logger = LoggerFactory.get_logger(__name__)

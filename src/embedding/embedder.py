@@ -1,3 +1,6 @@
+"""Module to embed ECLASS definitions using a specified SentenceTransformer model."""
+
+import numpy as np
 import pandas as pd
 import torch
 from sentence_transformers import SentenceTransformer
@@ -33,7 +36,8 @@ class EclassEmbedder:
         model_kwargs = model_kwargs or {}
         tokenizer_kwargs = tokenizer_kwargs or {}
         self.model = SentenceTransformer(
-            model_name,
+            model_name_or_path=model_name,
+            # model_name_or_path="../../models/model_name",  # Use this when downloading the model manually
             device=self.device,
             model_kwargs=model_kwargs,
             tokenizer_kwargs=tokenizer_kwargs
@@ -93,6 +97,7 @@ class EclassEmbedder:
                 "id": row["id"],
                 "preferred-name": row["preferred-name"],
                 "definition": row["definition"],
+                "vector-norm": float(np.linalg.norm(embedding)),
                 "embedding": embedding.tolist(),
             }
             for row, embedding in zip(valid_rows, embeddings)

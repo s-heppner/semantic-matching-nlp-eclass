@@ -1,4 +1,4 @@
-"""Lists of non-semantic ECLASS definitions to be excluded during embedding."""
+"""Module containing lists of non-semantic ECLASS definitions to be excluded during embedding."""
 
 filter_definitions_missing = [
     "-",

@@ -1,4 +1,4 @@
-"""Script to extract the classification classes from ECLASS XML files into CSV format."""
+"""Module to extract the classification classes from ECLASS XML files into CSV format."""
 
 import logging
 import pandas as pd
@@ -64,7 +64,7 @@ def extract_eclass_xml(input_path: str, output_path: str, logger: logging.Logger
 
 if __name__ == "__main__":
     # Settings
-    exceptions = []  # Adapt manually: exclude specific segments
+    exceptions = []  # Exclude specific segments
 
     # Setup
     logger = LoggerFactory.get_logger(__name__)

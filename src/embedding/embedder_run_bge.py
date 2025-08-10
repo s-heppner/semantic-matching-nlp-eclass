@@ -1,11 +1,11 @@
-"""Script to embed ECLASS definitions using the BAAI/bge-large-en-v1.5 transformer model."""
+"""Module to embed ECLASS definitions using the BAAI/bge-large-en-v1.5 transformer model."""
 
 from embedder import EclassEmbedder
 
 if __name__ == "__main__":
     # Settings
-    apply_filters = True  # Adapt manually: enable filtering of non-semantic definitions
-    exceptions = []  # Adapt manually: exclude specific segments
+    apply_filters = True  # Enable filtering of non-semantic definitions
+    exceptions = []  # Exclude specific segments
 
     # Setup
     embedder = EclassEmbedder(model_name="BAAI/bge-large-en-v1.5")

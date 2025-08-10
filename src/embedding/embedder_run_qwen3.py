@@ -1,13 +1,13 @@
-"""Script to embed ECLASS definitions using the Qwen/Qwen3-Embedding-8B transformer model."""
+"""Module to embed ECLASS definitions using the Qwen/Qwen3-Embedding-8B transformer model."""
 
 import torch
 from embedder import EclassEmbedder
 
 if __name__ == "__main__":
     # Settings
-    apply_filters = True  # Adapt manually: enable filtering of non-semantic definitions
-    exceptions = []  # Adapt manually: exclude specific segments
-    torch_dtype = torch.float16  # Adapt manually: use lower precision floating point to reduce memory usage
+    apply_filters = True  # Enable filtering of non-semantic definitions
+    exceptions = []  # Exclude specific segments
+    torch_dtype = torch.float16  # Use lower precision floating point to reduce memory usage
 
     # Setup
     embedder = EclassEmbedder(

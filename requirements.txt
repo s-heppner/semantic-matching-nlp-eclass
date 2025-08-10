@@ -8,3 +8,4 @@ plotly~=6.2.0
 scikit-learn~=1.7.0
 protobuf~=6.31.1
 accelerate~=1.9.0
+tqdm~=4.67.1
