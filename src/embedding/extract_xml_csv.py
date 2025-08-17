@@ -6,8 +6,8 @@ import xml.etree.ElementTree as et
 from src.utils.logger import LoggerFactory
 
 
-def extract_eclass_xml(input_path: str, output_path: str, logger: logging.Logger) -> None:
-    """Parses an ECLASS XML file and extracts class IDs, names, and definitions into a CSV."""
+def extract_eclass_xml(input_path: str, logger: logging.Logger) -> dict:
+    """Parses an ECLASS XML file and extracts class IDs, names, and definitions into a dict."""
 
     # Load ECLASS classes from XML file
     logger.info(f"Processing XML: {input_path}")
@@ -17,7 +17,7 @@ def extract_eclass_xml(input_path: str, output_path: str, logger: logging.Logger
         logger.info(f"Database loaded from {input_path}.")
     except Exception as e:
         logger.error(f"Failed to parse XML {input_path}: {e}")
-        return
+        return {}
 
     # Namespaces
     ns = {
@@ -25,10 +25,10 @@ def extract_eclass_xml(input_path: str, output_path: str, logger: logging.Logger
         "ontoml": "urn:iso:std:iso:is:13584:-32:ed-1:tech:xml-schema:ontoml",
         "xsi": "http://www.w3.org/2001/XMLSchema-instance"
     }
-    data = []
+    data: dict = {}
 
     def extract_elements(elements):
-        """Extracts fields "preferred_name" and "definition" from the given XML elements and appends them to a list."""
+        """Extracts fields "preferred_name" and "definition" from the given elements and stores them in a dict."""
 
         for elem in elements:
             elem_id = elem.attrib.get("id")
@@ -42,11 +42,10 @@ def extract_eclass_xml(input_path: str, output_path: str, logger: logging.Logger
             definition = def_el.text.strip() if def_el is not None and def_el.text else None
 
             # Save results
-            data.append({
-                "id": elem_id,
+            data[elem_id] = {
                 "preferred-name": preferred_name,
                 "definition": definition
-            })
+            }
 
     # Extract data from the dictionary
     dictionary_node = root.find(".//ontoml:ontoml/dictionary", namespaces=ns)
@@ -56,10 +55,7 @@ def extract_eclass_xml(input_path: str, output_path: str, logger: logging.Logger
     else:
         logger.warning(f"No dictionary node found in {input_path}")
 
-    # Save results
-    df = pd.DataFrame(data)
-    df.to_csv(output_path, index=False)
-    logger.info(f"Saved CSV to: {output_path}")
+    return data
 
 
 if __name__ == "__main__":
@@ -69,6 +65,7 @@ if __name__ == "__main__":
     # Setup
     logger = LoggerFactory.get_logger(__name__)
     segments = list(range(13, 52)) + [90]
+    all_data = {}
 
     # Run for each segment
     for segment in segments:
@@ -76,5 +73,19 @@ if __name__ == "__main__":
             logger.warning(f"Skipping segment {segment}.")
             continue
         input_path = f"../../data/original/ECLASS15_0_BASIC_EN_SG_{segment}.xml"
+        segment_data = extract_eclass_xml(input_path, logger)
+        all_data.update(segment_data)
+
+        # Save results
         output_path = f"../../data/extracted/eclass-{segment}.csv"
-        extract_eclass_xml(input_path, output_path, logger)
+        df = pd.DataFrame.from_dict(segment_data, orient="index").reset_index()
+        df.rename(columns={"index": "id"}, inplace=True)
+        df.to_csv(output_path, index=False)
+        logger.info(f"Saved CSV to: {output_path}")
+
+    # Save combined results
+    output_path = f"../../data/extracted/eclass-all.csv"
+    df = pd.DataFrame.from_dict(all_data, orient="index").reset_index()
+    df.rename(columns={"index": "id"}, inplace=True)
+    df.to_csv(output_path, index=False)
+    logger.info(f"Saved CSV to: {output_path}")

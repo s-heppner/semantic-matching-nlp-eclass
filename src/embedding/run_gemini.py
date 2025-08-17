@@ -97,24 +97,31 @@ def embed_eclass(
 if __name__ == "__main__":
     # Settings
     apply_filters = True  # Enable filtering of non-semantic definitions
-    exceptions = []  # Exclude specific segments
+    run_per_segment = True  # Compute embeddings per segment or in one run
+    exceptions = []  # Exclude specific segments if run per segment
     project = "PLACEHOLDER"  # Project name from Google Cloud
 
     # Setup
     logger = LoggerFactory.get_logger(__name__)
     logger.info("Initialising embedder ...")
     save_dir = "filtered" if apply_filters else "unfiltered"
-    segments = list(range(13, 52)) + [90]
 
     # Connect Gemini client via Vertex Ai
     client = genai.Client(vertexai=True, project=project, location="global")
     logger.info(f"Client loaded.")
 
-    # Run for each segment
-    for segment in segments:
-        if segment in exceptions:
-            logger.warning(f"Skipping segment {segment}.")
-            continue
-        input_path = f"../../data/extracted/eclass-{segment}.csv"
-        output_path = f"../../data/embedded/{save_dir}/eclass-{segment}-embeddings-gemini.json"
+    if run_per_segment:
+        # Run for each segment
+        segments = list(range(13, 52)) + [90]
+        for segment in segments:
+            if segment in exceptions:
+                logger.warning(f"Skipping segment {segment}.")
+                continue
+            input_path = f"../../data/extracted/eclass-{segment}.csv"
+            output_path = f"../../data/embedded/{save_dir}/eclass-{segment}-embeddings-gemini.json"
+            embed_eclass(input_path, output_path, logger, apply_filters=apply_filters)
+    else:
+        # Run for combined segments
+        input_path = f"../../data/extracted/eclass-all.csv"
+        output_path = f"../../data/embedded/{save_dir}/eclass-all-embeddings-gemini.json"
         embed_eclass(input_path, output_path, logger, apply_filters=apply_filters)

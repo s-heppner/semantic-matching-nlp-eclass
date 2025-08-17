@@ -30,7 +30,7 @@ def first_n_words(s: str, n: int) -> str:
     return " ".join(words[:n])
 
 
-def cluster_and_plot(input_path: str, output_path: str, logger: logging.Logger) -> None:
+def cluster_and_plot(input_path: str, output_path: str, logger: logging.Logger, segment: str = "All") -> None:
     """Loads embeddings, runs DBSCAN clustering, reduces with UMAP, and saves a Plotly HTML scatter."""
 
     logger.info(f"Starting clustering ...")
@@ -71,8 +71,8 @@ def cluster_and_plot(input_path: str, output_path: str, logger: logging.Logger) 
     df["y"] = embeddings_2d[:, 1]
 
     # Pre-wrap text columns
-    df["preferred_name_wrapped"] = df["preferred-name"].apply(lambda s: wrap_text(first_n_words(s, 3), width=16))
-    df["definition_wrapped"] = df["definition"].apply(lambda s: wrap_text(s, width=115))
+    df["preferred-name-wrapped"] = df["preferred-name"].apply(lambda s: wrap_text(first_n_words(s, 3), width=16))
+    df["definition"] = df["definition"].apply(lambda s: wrap_text(s, width=115))
 
     # Plot
     signal_palette = [
@@ -93,6 +93,9 @@ def cluster_and_plot(input_path: str, output_path: str, logger: logging.Logger) 
     for lbl in remaining_labels:
         color_discrete_map[lbl] = next(palette_iter)
 
+    show_labels = len(df) <= 300  # Only render labels when few points
+    model = input_path.split("-embeddings-")[-1].replace(".json", "").capitalize()
+
     df["cluster"] = df["cluster"].astype(str)
     fig = px.scatter(
         df,
@@ -102,17 +105,16 @@ def cluster_and_plot(input_path: str, output_path: str, logger: logging.Logger) 
         hover_data={
             "id": True,
             "preferred-name": True,
-            "preferred_name_wrapped": False,
-            "definition": False,
-            "definition_wrapped": True,
+            "preferred-name-wrapped": False,
+            "definition": True,
             "x": False,
             "y": False,
             "cluster": False
         },
-        title=f"ECLASS clustering - Segment {segment}",
+        title=f"ECLASS Clustering - Embedding Model {model} - Segment {segment}",
         category_orders={"cluster": ["-1"] + remaining_labels},
         color_discrete_map=color_discrete_map,
-        text="preferred_name_wrapped"  # Small name above point
+        text="preferred-name-wrapped" if show_labels else None  # Small name above point
     )
 
     fig.update_traces(
@@ -140,20 +142,27 @@ def cluster_and_plot(input_path: str, output_path: str, logger: logging.Logger) 
 if __name__ == "__main__":
     # Settings
     apply_filters = True  # Run clustering on filtered or unfiltered data
-    exceptions = []  # Exclude specific segments
-    transformer = "qwen3"  # Cluster embeddings from this transformer (qwen3, bge, gemini)
+    run_per_segment = False  # Compute clusters per segment or in one run
+    exceptions = []  # Exclude specific segments if run per segment
+    transformer = "bge"  # Cluster embeddings from this transformer (qwen3, bge, gemini)
 
     # Setup
     logger = LoggerFactory.get_logger(__name__)
     logger.info(f"Initialising clustering ...")
     input_dir = "filtered" if apply_filters else "unfiltered"
-    segments = list(range(13, 52)) + [90]
 
-    # Compute clusters for each segment
-    for segment in segments:
-        if segment in exceptions:
-            logger.warning(f"Skipping segment {segment}.")
-            continue
-        input_path = f"../../data/embedded/{input_dir}/eclass-{segment}-embeddings-{transformer}.json"
-        output_path = f"../../visualisation/eclass-{segment}-embeddings-{input_dir}-{transformer}.html"
+    if run_per_segment:
+        # Compute clusters for each segment
+        segments = list(range(13, 52)) + [90]
+        for segment in segments:
+            if segment in exceptions:
+                logger.warning(f"Skipping segment {segment}.")
+                continue
+            input_path = f"../../data/embedded/{input_dir}/eclass-{segment}-embeddings-{transformer}.json"
+            output_path = f"../../visualisation/eclass-{segment}-embeddings-{input_dir}-{transformer}.html"
+            cluster_and_plot(input_path, output_path, logger, str(segment))
+    else:
+        # Compute clusters for combined segments
+        input_path = f"../../data/embedded/{input_dir}/eclass-all-embeddings-{transformer}.json"
+        output_path = f"../../visualisation/eclass-all-embeddings-{input_dir}-{transformer}.html"
         cluster_and_plot(input_path, output_path, logger)

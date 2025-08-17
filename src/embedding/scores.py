@@ -11,7 +11,7 @@ import numpy as np
 def compute_similarities(embeddings_dir: str, output_db: str) -> None:
     """Computes cosine similarities between all embedding pairs and stores them in an SQLite database."""
 
-    file_paths: List[Path] = list(Path(embeddings_dir).glob("*.json"))
+    file_paths: List[Path] = list(Path(embeddings_dir).glob("*-qwen3.json"))
 
     entries: List[Dict[str, object]] = []
     for path in tqdm(file_paths, desc="Loading entries into memory"):
@@ -57,5 +57,5 @@ def compute_similarities(embeddings_dir: str, output_db: str) -> None:
 if __name__ == '__main__':
     compute_similarities(
         "../../data/embedded/filtered/",
-        "../../data/scores/eclass-scores-bge.sqlite"
+        "../../data/scores/eclass-scores-qwen3.sqlite"
     )
