@@ -7,7 +7,7 @@ from src.utils.logger import LoggerFactory
 
 
 def extract_eclass_xml(input_path: str, logger: logging.Logger) -> dict:
-    """Parses an ECLASS XML file and extracts class IDs, names, and definitions into a dict."""
+    """Parses an ECLASS XML file and extracts classification class IDs, names, and definitions into a dict."""
 
     # Load ECLASS classes from XML file
     logger.info(f"Processing XML: {input_path}")
@@ -28,9 +28,17 @@ def extract_eclass_xml(input_path: str, logger: logging.Logger) -> dict:
     data: dict = {}
 
     def extract_elements(elements):
-        """Extracts fields "preferred_name" and "definition" from the given elements and stores them in a dict."""
+        """
+        Extracts fields "id", "preferred_name" and "definition" from "class" nodes of type
+        "ontoml:CATEGORIZATION_CLASS_Type" (classification class) and stores them in a dict.
+        """
 
         for elem in elements:
+            # Only keep class nodes of type "ontoml:CATEGORIZATION_CLASS_Type"
+            xsi_type = elem.attrib.get(f"{{{ns['xsi']}}}type")
+            if xsi_type != "ontoml:CATEGORIZATION_CLASS_Type":
+                continue
+
             elem_id = elem.attrib.get("id")
             if elem_id is None:
                 continue
