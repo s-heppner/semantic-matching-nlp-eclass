@@ -57,7 +57,6 @@ coverage.xml
 *.pkl
 *.joblib
 *.db
-*.sqlite
 *.sav
 *.rda
 *.rdata

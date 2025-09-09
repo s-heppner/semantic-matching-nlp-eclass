@@ -1,5 +1,5 @@
 pandas~=2.3.1
-torch~=2.7.1+cu128
+torch~=2.8.0+cu128
 sentence-transformers~=5.0.0
 matplotlib~=3.10.3
 numpy~=2.2.6
@@ -7,5 +7,7 @@ umap-learn~=0.5.9.post2
 plotly~=6.2.0
 scikit-learn~=1.7.0
 protobuf~=6.31.1
-accelerate~=1.9.0
 tqdm~=4.67.1
+scikit-fuzzy~=0.5.0
+scipy~=1.16.1
+pytest~=8.4.2

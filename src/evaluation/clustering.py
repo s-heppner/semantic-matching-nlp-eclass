@@ -30,7 +30,13 @@ def first_n_words(s: str, n: int) -> str:
     return " ".join(words[:n])
 
 
-def cluster_and_plot(input_path: str, output_path: str, logger: logging.Logger, segment: str = "All") -> None:
+def cluster_and_plot(
+        input_path: str,
+        output_path: str,
+        model: str,
+        segment: str,
+        logger: logging.Logger
+) -> None:
     """Loads embeddings, runs DBSCAN clustering, reduces with UMAP, and saves a Plotly HTML scatter."""
 
     logger.info(f"Starting clustering ...")
@@ -94,7 +100,6 @@ def cluster_and_plot(input_path: str, output_path: str, logger: logging.Logger, 
         color_discrete_map[lbl] = next(palette_iter)
 
     show_labels = len(df) <= 300  # Only render labels when few points
-    model = input_path.split("-embeddings-")[-1].replace(".json", "").capitalize()
 
     df["cluster"] = df["cluster"].astype(str)
     fig = px.scatter(
@@ -111,7 +116,7 @@ def cluster_and_plot(input_path: str, output_path: str, logger: logging.Logger, 
             "y": False,
             "cluster": False
         },
-        title=f"ECLASS Clustering - Embedding Model {model} - Segment {segment}",
+        title=f"ECLASS Clustering - Embedding Model {model.capitalize()} - Segment {segment}",
         category_orders={"cluster": ["-1"] + remaining_labels},
         color_discrete_map=color_discrete_map,
         text="preferred-name-wrapped" if show_labels else None  # Small name above point
@@ -160,9 +165,9 @@ if __name__ == "__main__":
                 continue
             input_path = f"../../data/embedded/{input_dir}/eclass-{segment}-embeddings-{transformer}.json"
             output_path = f"../../visualisation/eclass-{segment}-embeddings-{input_dir}-{transformer}.html"
-            cluster_and_plot(input_path, output_path, logger, str(segment))
+            cluster_and_plot(input_path, output_path, transformer, str(segment), logger)
     else:
         # Compute clusters for combined segments
         input_path = f"../../data/embedded/{input_dir}/eclass-all-embeddings-{transformer}.json"
         output_path = f"../../visualisation/eclass-all-embeddings-{input_dir}-{transformer}.html"
-        cluster_and_plot(input_path, output_path, logger)
+        cluster_and_plot(input_path, output_path, transformer, "All", logger)

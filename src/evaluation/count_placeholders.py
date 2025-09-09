@@ -89,15 +89,31 @@ def plot_nonsemantic_ratios(
     ]
 
     # Plot
-    plt.figure(figsize=(16, 8), dpi=300)
+    plt.figure(figsize=(20, 8), dpi=300)
 
-    color_missing = "#407fb7"  # lighter
-    color_struct = "#8ebae5"  # darker
+    color_missing = "#4E5F72"  # Dark blue, adapted from standard #7D91A6 with red +9, green +11, blue + 13
+    color_struct = "#7D91A6"  # Light blue from standard colour palette
 
     bottom = [0.0] * len(processed_segments)
-    plt.bar(x_labels, miss_pct, bottom=bottom, label="Missing definition", color=color_missing)
+    plt.bar(
+        x_labels,
+        miss_pct,
+        bottom=bottom,
+        label="Missing definition",
+        color=color_missing,
+        edgecolor="black",
+        linewidth=0.3
+    )
     bottom = [b + h for b, h in zip(bottom, miss_pct)]
-    plt.bar(x_labels, struct_pct, bottom=bottom, label="Structural definition", color=color_struct)
+    plt.bar(
+        x_labels,
+        struct_pct,
+        bottom=bottom,
+        label="Structural definition",
+        color=color_struct,
+        edgecolor="black",
+        linewidth=0.3
+    )
     bottom = [b + h for b, h in zip(bottom, struct_pct)]
 
     # Percent labels inside each stacked part
@@ -105,7 +121,7 @@ def plot_nonsemantic_ratios(
         m = miss_pct[i]
         s = struct_pct[i]
         if m > 0:
-            # centered in the bottom segment
+            # Centered in the bottom segment
             plt.text(
                 i, m / 2.0, f"{m:.1f}%",
                 ha="center", va="center",
@@ -113,7 +129,7 @@ def plot_nonsemantic_ratios(
                 color="white"
             )
         if s > 0:
-            # centered in the structural segment
+            # Centered in the structural segment
             plt.text(
                 i, m + (s / 2.0), f"{s:.1f}%",
                 ha="center", va="center",
@@ -158,7 +174,7 @@ def plot_nonsemantic_ratios(
 
     plt.axhline(
         y=mean_pct,
-        color="red",
+        color="#CA4B2E",  # Light red from standard colour palette
         linestyle="--",
         linewidth=1.5,
         alpha=0.7,
@@ -168,7 +184,7 @@ def plot_nonsemantic_ratios(
         x=- 0.3,
         y=mean_pct + 0.5,
         s=f"{mean_pct:.1f}%",
-        color="red",
+        color="#CA4B2E",  # Light red from standard colour palette
         fontsize="xx-small",
         fontweight="bold",
         va="bottom",
@@ -188,19 +204,15 @@ def plot_nonsemantic_ratios(
     plt.legend(
         fontsize="small",
         loc="upper center",
-        bbox_to_anchor=(0.5, -0.2),
+        bbox_to_anchor=(0.5, -0.12),
         ncol=2,
         frameon=False
     )
 
-    plt.grid(axis="y", linestyle="--", alpha=0.6)
-    plt.tight_layout(rect=(0, 0.05, 1, 1))
+    plt.grid(axis="y", linestyle="--", color="black", alpha=0.2)
 
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
     plt.savefig(output_path, bbox_inches="tight")
     logger.info(f"Plot saved to: {output_path}")
-
-    plt.show()
 
 
 if __name__ == "__main__":
