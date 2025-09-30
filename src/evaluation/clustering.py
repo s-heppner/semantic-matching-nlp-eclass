@@ -2,13 +2,15 @@
 
 import logging
 import textwrap
+from itertools import cycle
+
 import numpy as np
 import pandas as pd
 import plotly.express as px
 import umap
-from itertools import cycle
 from sklearn.cluster import DBSCAN
 from sklearn.preprocessing import normalize
+
 from src.utils.io import load_json
 from src.utils.logger import LoggerFactory
 

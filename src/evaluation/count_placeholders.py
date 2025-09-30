@@ -1,15 +1,14 @@
 """Module to visualise non-semantic ECLASS definitions using predefined filters."""
 
 import logging
+from typing import Dict, List
+
 import matplotlib.pyplot as plt
-import os
 import pandas as pd
-from typing import List, Dict
-from src.embedding.filter import (
-    filter_definitions_missing,
-    filter_definitions_missing_suffix,
-    filter_definitions_structural,
-)
+
+from src.embedding.filter import (filter_definitions_missing,
+                                  filter_definitions_missing_suffix,
+                                  filter_definitions_structural)
 from src.utils.logger import LoggerFactory
 
 

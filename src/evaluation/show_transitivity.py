@@ -2,6 +2,7 @@
 
 import numpy as np
 from matplotlib import pyplot as plt
+
 from src.embedding.scores import load_matrix
 from src.service.fuzzy_logic import k_exact_simple_paths, k_maxprod_composition
 

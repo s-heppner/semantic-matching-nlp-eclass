@@ -1,10 +1,11 @@
 """This module can calculate the matching scores using cosine similarity and stores results in an SQLite database."""
 
 import json
-import numpy as np
 import sqlite3
 from pathlib import Path
 from typing import Dict, List, Tuple
+
+import numpy as np
 from tqdm import tqdm
 
 

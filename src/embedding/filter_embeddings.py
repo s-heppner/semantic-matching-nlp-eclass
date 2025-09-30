@@ -1,11 +1,9 @@
 """Module to filter out non-semantic embeddings from ECLASS embedding files."""
 
-from src.embedding.filter import (
-    filter_definitions_missing,
-    filter_definitions_missing_suffix,
-    filter_definitions_structural,
-)
-from src.utils.io import save_json, load_json
+from src.embedding.filter import (filter_definitions_missing,
+                                  filter_definitions_missing_suffix,
+                                  filter_definitions_structural)
+from src.utils.io import load_json, save_json
 from src.utils.logger import LoggerFactory
 
 if __name__ == "__main__":

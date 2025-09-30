@@ -1,7 +1,9 @@
 """Module to identify potentially non-semantic ECLASS definitions based on regex patterns."""
 
-import pandas as pd
 import re
+
+import pandas as pd
+
 from src.utils.logger import LoggerFactory
 
 if __name__ == "__main__":

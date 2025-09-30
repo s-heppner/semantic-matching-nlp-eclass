@@ -4,11 +4,10 @@ import numpy as np
 import pandas as pd
 import torch
 from sentence_transformers import SentenceTransformer
-from src.embedding.filter import (
-    filter_definitions_missing,
-    filter_definitions_missing_suffix,
-    filter_definitions_structural,
-)
+
+from src.embedding.filter import (filter_definitions_missing,
+                                  filter_definitions_missing_suffix,
+                                  filter_definitions_structural)
 from src.utils.io import save_json
 from src.utils.logger import LoggerFactory
 

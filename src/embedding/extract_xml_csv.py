@@ -1,8 +1,10 @@
 """Module to extract the classification classes from ECLASS XML files into CSV format."""
 
 import logging
-import pandas as pd
 import xml.etree.ElementTree as et
+
+import pandas as pd
+
 from src.utils.logger import LoggerFactory
 
 

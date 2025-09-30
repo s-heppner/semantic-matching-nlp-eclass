@@ -1,15 +1,15 @@
 """Module to embed ECLASS definitions using the gemini-embedding-001 transformer model."""
 
 import logging
+
 import numpy as np
 import pandas as pd
 from google import genai
 from google.genai.types import EmbedContentConfig
-from src.embedding.filter import (
-    filter_definitions_missing,
-    filter_definitions_missing_suffix,
-    filter_definitions_structural,
-)
+
+from src.embedding.filter import (filter_definitions_missing,
+                                  filter_definitions_missing_suffix,
+                                  filter_definitions_structural)
 from src.utils.io import save_json
 from src.utils.logger import LoggerFactory
 

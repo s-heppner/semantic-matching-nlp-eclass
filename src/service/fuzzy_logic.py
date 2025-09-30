@@ -3,8 +3,9 @@
 import numpy as np
 import skfuzzy as fuzz
 from scipy.sparse.csgraph import dijkstra
-from src.utils.logger import LoggerFactory
 from tqdm.auto import tqdm
+
+from src.utils.logger import LoggerFactory
 
 
 def k_maxprod_composition(r: np.ndarray, k: int = 2) -> np.ndarray:
