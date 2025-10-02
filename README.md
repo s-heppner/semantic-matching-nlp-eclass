@@ -16,14 +16,18 @@ semantic-matching-nlp-eclass/
 │   │   ├── filtered/               # Filtered Embeddings
 │   │   └── unfiltered/             # Unfiltered Embeddings
 │   ├── extracted/                  # Extracted data
-│   └── original/                   # Original data
+│   ├── original/                   # Original data
+│   └── scores/                     # Matching scores
 │
 ├── src/                            # Source code
 │   ├── embedding/                  # Data preprocessing and embeddings generation
 │   ├── evaluation/                 # Data evaluation and visualisation
+│   ├── service/                    # Semantic Matching Service
 │   └── utils/                      # Helper functions
 │
 ├── test/                           # Unit testing
+│
+├── test_data/                      # Data for testing
 │
 └── visualisation/                  # Visualised results
 ```

@@ -11,3 +11,5 @@ tqdm~=4.67.1
 scikit-fuzzy~=0.5.0
 scipy~=1.16.1
 pytest~=8.4.2
+pyspellchecker~=0.8.3
+openai~=2.0.1

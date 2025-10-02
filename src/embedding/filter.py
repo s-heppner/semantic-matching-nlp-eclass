@@ -35,6 +35,7 @@ filter_definitions_structural = [
     "Group (3rd level) for objects which can not be put in order into other groups of the existing structure but are assigned to the main group lying over this at the 2nd level and are applied in a quite specific field of application",
     "Sub-group (4th level) for objects with spare part characteristics that maintain or restore the unfiltered condition of the objects classified under the parent-class on the 3rd level",
     "Sub-group (4th level) for objects with spare part characteristics that maintain or re-store the unfiltered condition of the objects classified under the parent-class on the 3rd Level",
+    "group (3rd level) for objects that cannot be classified into other specified groups in the existing structure, but that are classified to their parent-class on the 2nd level. a xx-xx-90-00-class cannot have any other sub-groups besides the generic xx-xx-90-90-class (…(other, unspecified)) to be generally valid within the parent class on the 2nd level",
     "group (3rd level) for objects that cannot be classified into other specified groups in the existing structure, but that are classified to their parent-class on the 2nd level. A xx-xx-90-00-class cannot have any other sub-groups besides the generic xx-xx-90-90-class (…(Other, unspecified)) to be generally valid within the parent class on the 2nd level",
     "Sub-group (4th level) for objects with complemental characteristics, without which the basic function of the objects classified under the parent-class on the 3rd level is still guaranteedel",
     "Subgroup (4th level) for objects that cannot be classified into other specified subgroups of the existing structure, but that are classified to their parent-class on the 3rd level",
@@ -46,4 +47,5 @@ filter_definitions_structural = [
     "Sub-group (4th level) for objects with spare part characteristics that maintain or re-store the original condition of the objects classified under the parent-class on the 3rd level",
     "Group (3rd level) for objects that cannot be classified into other specified groups in the existing structure, but that are classified to their parent-class on the 2nd level. A xx-xx-90-00-class cannot have any other sub-groups besides the generic xx-xx-90-90-class (â€¦(Other, unspecified)) to be generally valid within the parent class on the 2nd level",
     "sub-group (4th level) for objects with spare part characteristics that maintain or re-store the original condition of the objects classified under the parent-class on the 3rd level",
+    "Subgroup (4th level) for objects with spare part characteristics that maintain or restore the original condition of the objects classified under the parent-class on the 3rd level"
 ]

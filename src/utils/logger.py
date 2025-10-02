@@ -29,7 +29,7 @@ class LoggerFactory:
     def get_logger(name: str, level=logging.INFO) -> logging.Logger:
         """Returns a logger with colour formatting for console output."""
 
-        formatter = LoggerFactory.ColorFormatter("%(asctime)s [%(levelname)s] %(message)s")
+        formatter = LoggerFactory.ColorFormatter("%(asctime)s [%(levelname)s] %(message)s", "%H:%M")
 
         handler = logging.StreamHandler()
         handler.setFormatter(formatter)
